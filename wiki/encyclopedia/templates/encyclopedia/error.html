@@ -1,0 +1,25 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Entry not found: {{entry}}
+{% endblock %}
+
+{% block body %}
+
+  <div class="text-center d-flex justify-content-center flex-column h-100">
+    <h1 class="fs-1"> <strong class="text-danger"> Error: </strong> Entry "{{entry}}" does not exist</h1>
+
+    <p class="fs-3">The requested entry "{{entry}}" does not exist on qwikipedia.</p>
+    <p class="fs-5">Check the <a href="{% url 'index' %}">index</a> page to see available articles.</p>
+
+    {% if related_titles %}
+    <p>Related Entries:</p>
+      <ul>
+        {% for title in related_titles %}
+        <li><a href="{% url 'entries' title=title %}">{{title}}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+
+{% endblock %}

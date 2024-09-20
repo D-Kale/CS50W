@@ -1,0 +1,42 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="{% static 'encyclopedia/styles.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        <div class="row vh-100 vw-100">
+            <div class="sidebar col-lg-2 col-md-3 h-auto">
+                <div class="sticky-top">
+                    <div class="text-center">
+                        <img class="w-75 py-3" src="https://members-csforall.imgix.net/members/logos/cs50-black.PNG" alt="">
+                    </div>
+                    <h2 class="text-center font-weight-bold">Wiki</h2>
+                    <form action="{% url 'search' %}" method="get">
+                        <input class="search form-control text-center" type="text" name="q" placeholder="Search Encyclopedia">
+                    </form>
+                    <div class="my-1">
+                        <a href="{% url 'index' %}" class="ml-3"><h3> Home </h3></a>
+                    </div>
+                    <div class="my-1">
+                        <a href="{% url 'create' %}" class="ml-3"><h3> Create New Page </h3></a>
+                    </div>
+                    <div class="my-1">
+                        <a href="{% url 'random_entry' %}" class="ml-3"><h3> Random Page </h3></a>
+                    </div>
+                    {% block nav %}
+                    {% endblock %}
+                </div>
+            </div>
+            <div class="col-lg-10 col-md-9">
+                {% block body %}
+                {% endblock %}
+            </div>
+        </div>
+
+    </body>
+</html>

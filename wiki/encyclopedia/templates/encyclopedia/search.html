@@ -1,0 +1,35 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block body %}
+
+    <div class="text-center d-flex flex-column h-100 {% if not results %}justify-content-center{% endif %}">
+        <h1>Resultados de Búsqueda para "{{ query }}"</h1>
+            
+        {% if results %}
+            <ul>
+                {% for entry in results %}
+
+                    <div class="card my-3">
+                        <div class="card-body">
+                        <blockquote class="blockquote mb-0 pl-2">
+
+                            <a href="{% url 'entries' entry %}">{{ entry }}</a>
+                            <footer class="blockquote-footer"> Your search have a coincidence in <cite title="Source Title" class="font-weight-bold">{{origin}}</cite> with this entry</footer>
+                        </blockquote>
+                      </div>
+                    </div>
+
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No se encontraron resultados para "{{ query }}".</p>
+        {% endif %}
+
+        <a href="{% url 'index' %}">Volver a la página principal</a>
+    </div>
+
+{% endblock %}

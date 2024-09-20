@@ -1,0 +1,26 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Create Wiki
+{% endblock %}
+
+{% block body %}
+
+    <h1 class="mb-3">Create a new Entry</h1>
+
+    <form action="{% url 'create' %}" class="h-75 mb-3" method="post">
+        {% csrf_token %}
+        <div class="h-100  d-flex justify-content-center flex-column">
+            <label class="w-100 mx-2">
+                Title: <input class="w-100 form-control" type="text" name="title" required>
+            </label>
+            <br>
+            <label class="w-100 mx-2 h-100">
+                Content: <textarea class="w-100 h-100 form-control" name="content" required></textarea>
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4 ml-2">Submit</button>
+    </form>
+
+{% endblock %}
