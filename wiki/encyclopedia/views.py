@@ -16,6 +16,7 @@ def create(request):
     if request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
+
         if title and content:
             util.save_entry(title, content)
             return redirect('index')
@@ -47,6 +48,13 @@ def edit(request, entry):
         "content": content
     })
 
+def delete_entry(request, entry):
+    list = util.list_entries()
+    for object in list:
+        if entry.lower() == object.lower():
+            util.delete(entry)
+            
+    return redirect('index')
 
 def entries(request, entry):
     content_md = util.get_entry(entry)

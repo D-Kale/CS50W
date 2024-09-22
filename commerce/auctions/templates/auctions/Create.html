@@ -1,0 +1,22 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <form action="{% url 'create' %}" method="post">
+        {% csrf_token %}
+        <label> Title <input type="text" name="title"></label>
+        <label> Description <input type="text" name="description"></label>
+        <label> Image <input type="text" name="image"></label>
+        <label> Price <input type="text" name="price"></label>
+
+        <label for="category">Choose a category:</label>
+        <select name="category" id="category">
+            {% for cat in categories %}
+                <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">Create Listing</button>
+    </form>
+
+{% endblock %}
