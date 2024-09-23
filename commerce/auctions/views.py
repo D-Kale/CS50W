@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib import messages
 
-from .models import Bid, Category, Listing, User, Comment
+from .models import Bid, Category, Listing, User, Comment, Stars
 
 
 def index(request):
@@ -13,6 +14,25 @@ def index(request):
     return render(request, "auctions/index.html", {
         "listings" : allListings
     })
+
+def stars(request, id):
+    listingdata = Listing.objects.get(pk=id)
+    stars_value = int(request.POST['stars'])
+    currentuser = request.user
+
+    if stars_value > 5 or stars_value < 1:
+        messages.error(request, "This is not an avalible cantity of stars")
+
+    try:
+        existingstar = Stars.objects.get(User = currentuser, listing = listingdata)
+
+        existingstar.stars = stars_value
+        existingstar.sabe()
+    except Stars.DoesNotExist:
+        new_star = Stars(stars=stars_value, user=currentuser, listing=listingdata)
+        new_star.save()
+
+    return redirect('listing', id=id)
 
 def create(request):
     if request.method == "GET":
@@ -77,9 +97,6 @@ def listing(request, id):
         "isOwner": isOwner
     })
 
-
-from django.contrib import messages
-from django.shortcuts import redirect
 
 def addBid(request, id):
     newBid = int(request.POST['newBid'])

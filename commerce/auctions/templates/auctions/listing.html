@@ -22,77 +22,136 @@
         </div>
     {% endif %}
 
-    <div>
-        <div>
-            <img src=" {{list.image}} " alt="image">
+    <div class="card h-50 mb-3">
+        <div class="card-body d-flex">
+            <div class="w-25 text-center mx-4">
+                <img class="img-thumbnail rounded float-left h-100 w-100" src="{{list.img}}" alt="image" srcset="">
+            </div>
+            <div class="w-75 mx-4 py-3">
+                <h4> {{listing.title}} </h4>
+                <h4><strong>Bid:</strong> {{listing.price.bid}} </h4>
+                <h4><strong>Category:</strong> {{listing.category}} </h4>
+                <h4><strong>Owner:</strong> {{listing.owner}} </h4>
+
+                
+                {% if user.is_authenticated and listing.isActive %}
+                    <form action="{% url 'addBid' id=listing.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="price"><h4><strong>Add Bid</strong></h4></label>
+                            <input id="price" min="{{listing.price.bid}}" type="number" name="newBid" placeholder="Add New Bid">
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                {% endif %}
+
+            </div>
         </div>
-        <div>
-            <h2> {{listing.title}} </h2>
-            <h3><strong>Price:</strong> {{listing.price.bid}} </h3>
-            <h3><strong>Category:</strong> {{listing.category}} </h3>
-        </div>
-        <h3><strong>Owner:</strong> {{listing.owner}} </h3>
     </div>
 
 
-    {% if user.is_authenticated and listing.isActive %}
-        <form action="{% url 'addBid' id=listing.id %}" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="price">Add Bid</label>
-                <input id="price" min="{{listing.price.bid}}" type="number" name="newBid" placeholder="Add New Bid">
-                <button type="submit" class="btn btn-primary">Add</button>
-            </div>
-        </form>
-    {% endif %}
-
-    {% if user.is_authenticated and listing.isActive %}
-
-        <form action="{% url 'watchlistFunction' id=listing.id %}" method="POST">
-        {% csrf_token %}
-            {% if isListingInWatchlist %}
-                    <button type="submit">Delete from watchlist</button>
-            {% else %}
-                    <button type="submit">Add to watchlist</button>
-            {% endif %}
-
-        </form>
-
-        {% if isOwner %}
-        <form action="{% url 'closeAuction' id=listing.id %}" method="POST" class="mx-3">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Close Auction</button>
-        </form>
-        {% endif %}
-
-    {% endif %}
-
-    <h2>Comments</h2>
-
-    <br>
-
-    {% if user.is_authenticated %}
-        <form action="{% url 'addComment' id=listing.id %}" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="price">Add Comment</label>
-                <input id="price" type="text" name="newComment" placeholder="Add New Comment">
-                <button type="submit" class="btn btn-warning">Add</button>
-            </div>
-        </form>
-    {% endif %}
-
-    <br>
-
-    <ul class="list-group">
-        {% for comment in allComments %}
-            <li class="list-group-item">
-                {{ comment.message }}
+    <div class="card">
+        <div class="card-body d-flex">
+            <div class="w-50 text-center mx-4">
+                <h2>Comments</h2>
+            
                 <br>
-                <p>Posted by <strong>{{ comment.author }}</strong></p>
-            </li>
-        
-        {% endfor %}
-    </ul>
+            
+                <ul class="list-group">
+                    {% for comment in allComments %}
+                        <li class="list-group-item">
+                            {{ comment.message }}
+                            <br>
+                            <p>Posted by <strong>{{ comment.author }}</strong></p>
+                        </li>
+                    
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="w-50 mx-4 py-3 text-right">
+                {% if user.is_authenticated and listing.isActive %}
+
+                    <div class="d-flex mb-3 justify-content-between">
+                        <div class="w-auto">
+
+                            <form action="{% url 'stars' listing.id %}" class="d-flex align-items-center justify-content-end" method="post">
+                                {% csrf_token %}
+                                <div class="rating">
+                                    <input value="5" name="stars" id="star5" type="radio">
+                                    <label for="star5"></label>
+                                    <input value="4" name="stars" id="star4" type="radio">
+                                    <label for="star4"></label>
+                                    <input value="3" name="stars" id="star3" type="radio">
+                                    <label for="star3"></label>
+                                    <input value="2" name="stars" id="star2" type="radio">
+                                    <label for="star2"></label>
+                                    <input value="1" name="stars" id="star1" type="radio">
+                                    <label for="star1"></label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Rating</button>
+                            </form>
+
+                        </div>
+
+                        <div class="w-auto">
+
+                            <form action="{% url 'watchlistFunction' id=listing.id %}" method="POST">
+                            {% csrf_token %}
+                                {% if isListingInWatchlist %}
+                                        <button type="submit" class="btn btn-danger">Delete from watchlist</button>
+                                {% else %}
+                                        <button type="submit" class="btn btn-success">Add to watchlist</button>
+                                {% endif %}
+                    
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                    <form action="{% url 'addComment' id=listing.id %}" method="POST">
+                            {% csrf_token %}
+                            
+                            <div class="bg-white border rounded p-3 text-sm">
+                                <h1 class="text-center text-secondary text-xl font-weight-bold">Send Feedback</h1>
+                                
+                                <div class="form-group">
+                                    <textarea class="form-control mt-3" name="newComment" placeholder="Your feedback..." rows="4" style="resize: none; height: 25rem;"></textarea>
+                                </div>
+                            
+                                <div class="d-flex justify-content-between mt-3">
+
+                                    <div class="flex-grow-1"></div>
+                            
+                                    <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center p-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M15.999 0l-5.5 3.5L10 6l-.021-.021c-1.677-1.677-4.166-1.72-5.841-.043L0 10.1V16h5.9l3.938-4.139c1.677-1.676 1.634-4.164-.043-5.841L10 6l2.5-.5L16 0zM2.5 13.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm1.5 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm2.5-2a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                                        </svg>
+                                    </button>
+                                                                  
+                                </div>
+                            </div>
+                            
+                            
+                    </form>
+
+                    
+
+            
+                    {% if isOwner %}
+                    <form action="{% url 'closeAuction' id=listing.id %}" method="POST" class="mx-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Close Auction</button>
+                    </form>
+                    {% endif %}
+            
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+
+
 
 {% endblock %}

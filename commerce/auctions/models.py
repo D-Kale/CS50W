@@ -39,3 +39,11 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author} comment on {self.listing}"
+    
+class Stars(models.Model):
+    stars = models.IntegerField(default=0) 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='userStars')
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='listingStars')
+
+    def __str__(self):
+        return f"{self.user} gave {self.stars} stars to {self.listing}"

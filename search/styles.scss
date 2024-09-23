@@ -2,6 +2,12 @@
     margin: 0px;
     height: 100vh;
     font-family: Arial, sans-serif;
+    transition: opacity 0.5s ease;
+
+    .hidden {
+        opacity: 0;
+    }
+    
 }
 
 input {
@@ -166,11 +172,3 @@ input {
     }
 }
 
-
-body {
-    transition: opacity 0.5s ease;
-}
-
-.hidden {
-    opacity: 0;
-}

@@ -4,15 +4,22 @@
     <h2>Active Listings</h2>
 
     {% for list in listings %}
-        <div>
-            <img src=" {{list.image}} " alt="image">
-            <div>
+
+    <div class="card">
+        <div class="card-body d-flex">
+            <div class="w-25 text-center mx-4">
+                <img class="img-thumbnail rounded float-left h-100 w-100" src="{{list.img}}" alt="image" srcset="">
+            </div>
+            <div class="w-75 mx-4 py-3">
                 <h2> {{list.title}} </h2>
                 <h3><strong>Price:</strong> {{list.price.bid}} </h3>
                 <h3><strong>Category:</strong> {{list.category}} </h3>
-                <a href="{% url 'listing' list.id %}"><button type="button">See more</button></a>
+                <h3><strong>Owner:</strong> {{list.owner}} </h3>
+                <a href="{% url 'listing' list.id %}"><button type="button" class="btn btn-primary">See more</button></a>
             </div>
         </div>
+    </div>
+
     {% endfor %}
     
 {% endblock %}
