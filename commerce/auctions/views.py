@@ -17,17 +17,17 @@ def index(request):
 
 def stars(request, id):
     listingdata = Listing.objects.get(pk=id)
-    stars_value = int(request.POST['stars'])
+    stars_value = int(request.POST['stars'], 0)
     currentuser = request.user
 
     if stars_value > 5 or stars_value < 1:
         messages.error(request, "This is not an avalible cantity of stars")
 
     try:
-        existingstar = Stars.objects.get(User = currentuser, listing = listingdata)
+        existingstar = Stars.objects.get(user = currentuser, listing = listingdata)
 
         existingstar.stars = stars_value
-        existingstar.sabe()
+        existingstar.save()
     except Stars.DoesNotExist:
         new_star = Stars(stars=stars_value, user=currentuser, listing=listingdata)
         new_star.save()
