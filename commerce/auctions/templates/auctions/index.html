@@ -1,7 +1,29 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Active Listings</h2>
+
+        <div class="filter-container my-4">
+            <h3 class="d-inline-block mr-3">Filter by Category:</h3>
+            <form method="GET" action="" class="d-inline-block">
+                <div class="input-group">
+                    <select name="category" class="form-control" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.categoryName }}" {% if category.categoryName == selected_category %}selected{% endif %}>
+                                {{ category.categoryName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     {% for list in listings %}
 
@@ -10,11 +32,12 @@
             <div class="w-25 text-center mx-4">
                 <img class="img-thumbnail rounded float-left h-100 w-100" src="{{list.imageUrl}}" alt="image" srcset="">
             </div>
-            <div class="w-75 mx-4 py-3">
+            <div class="w-75 mx-4 py-3 align-content-center">
                 <h2> {{list.title}} </h2>
                 <h3><strong>Price:</strong> {{list.price.bid}} </h3>
                 <h3><strong>Category:</strong> {{list.category}} </h3>
                 <h3><strong>Owner:</strong> {{list.owner}} </h3>
+                <h3><strong>Average Rating:</strong> {{ list.average_stars|default:"N/A" }}</h3>
                 <a href="{% url 'listing' list.id %}"><button type="button" class="btn btn-primary">See more</button></a>
             </div>
         </div>

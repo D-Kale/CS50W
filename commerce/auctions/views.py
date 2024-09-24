@@ -1,20 +1,34 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
+from django.db.models import Avg
 
 from .models import Bid, Category, Listing, User, Comment, Stars
 
 
 def index(request):
-    allListings = Listing.objects.filter(isActive=True)
     allCategories = Category.objects.all()
+    selected_category = request.GET.get('category')
+
+    if selected_category:
+        allListings = Listing.objects.filter(isActive=True, category__categoryName=selected_category)
+    else:
+        allListings = Listing.objects.filter(isActive=True)
+
+    allListings = allListings.annotate(average_stars=Avg('listingStars__stars'))
+
     return render(request, "auctions/index.html", {
-        "listings" : allListings
+        "listings": allListings,
+        "categories": allCategories,
+        "selected_category": selected_category
     })
 
+@login_required(login_url='login')
 def stars(request, id):
     listingdata = Listing.objects.get(pk=id)
     stars_value = int(request.POST['stars'], 0)
@@ -34,6 +48,7 @@ def stars(request, id):
 
     return redirect('listing', id=id)
 
+@login_required(login_url='login')
 def create(request):
     if request.method == "GET":
         allCategories = Category.objects.all()
@@ -66,14 +81,19 @@ def create(request):
 
         return HttpResponseRedirect(reverse(index))
 
-
+@login_required(login_url='login')
 def displayWatchlist(request):
     currentUser = request.user
     listings = currentUser.listingWatchlist.all()
+
+    watchlist_ids = set(listings.values_list('id', flat=True))
+    
     return render(request, "auctions/watchlist.html", {
-        "listings": listings
+        "listings": listings,
+        "isListingInWatchlist": watchlist_ids,
     })
 
+@login_required(login_url='login')
 def watchlist(request, id):
     listingData = Listing.objects.get(pk = id)
     currentUser = request.user
@@ -83,21 +103,43 @@ def watchlist(request, id):
     else:
         listingData.watchlist.add(currentUser)
     
-    return HttpResponseRedirect(reverse("listing", args=(id, )))
+    from_page = request.POST.get('from_page')
 
+    if from_page == 'watchlist':
+        return HttpResponseRedirect(reverse("watchlist"))
+    else:
+        return HttpResponseRedirect(reverse("listing", args=(id, )))
+
+@login_required(login_url='login')
 def listing(request, id):
     listingData = Listing.objects.get(pk=id)
     isListingInWatchlist = request.user in listingData.watchlist.all()
     allComments = Comment.objects.filter(listing=listingData)
     isOwner = request.user.username == listingData.owner.username
+
+    stars = Stars.objects.filter(listing=listingData)
+    
+    average_stars = stars.aggregate(Avg('stars'))['stars__avg']
+
+    try:
+        user_star = Stars.objects.get(user=request.user, listing=listingData).stars
+    except Stars.DoesNotExist:
+        user_star = None
+
+
+    if average_stars is None:
+        average_stars = 0
+
     return render(request, "auctions/listing.html", {
         "listing": listingData,
         "isListingInWatchlist": isListingInWatchlist,
         "allComments": allComments,
-        "isOwner": isOwner
+        "isOwner": isOwner,
+        "starRate": round(average_stars, 1),
+        "user_star": user_star
     })
 
-
+@login_required(login_url='login')
 def addBid(request, id):
     newBid = int(request.POST['newBid'])
     listingData = Listing.objects.get(pk=id)
@@ -113,8 +155,7 @@ def addBid(request, id):
 
     return redirect('listing', id=id)
 
-
-
+@login_required(login_url='login')
 def closeAuction(request, id):
     listingData = Listing.objects.get(pk=id)
     listingData.isActive = False
@@ -131,6 +172,7 @@ def closeAuction(request, id):
         "message": "Congratulations! Your auction is closed."
     })
 
+@login_required(login_url='login')
 def addComment(request, id):
     currentUser = request.user
     listingData = Listing.objects.get(pk=id)
