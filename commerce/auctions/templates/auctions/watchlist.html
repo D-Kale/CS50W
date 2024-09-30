@@ -1,0 +1,40 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<h1>Watchlist</h1>
+
+{% for listing in listings %}
+<div class="card">
+    <div class="card-body d-flex">
+        <div class="w-25 text-center mx-4">
+            <img class="img-thumbnail rounded float-left h-100 w-100" src="{{listing.imageUrl}}" alt="image" srcset="">
+        </div>
+        <div class="w-75 mx-4 py-3 align-content-center">
+            <h2>{{ listing.title }}</h2>
+            <h3><strong>Price:</strong> {{ listing.price.bid }}</h3>
+            <h3><strong>Category:</strong> {{ listing.category }}</h3>
+            <h3><strong>Owner:</strong> {{ listing.owner }}</h3>
+
+            {% if user.is_authenticated and listing.isActive %}
+
+            <form action="{% url 'watchlistFunction' id=listing.id %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="from_page" value="watchlist">
+                {% if isListingInWatchlist %}
+                        <button type="submit" class="btn btn-danger">Delete from watchlist</button>
+                {% else %}
+                        <button type="submit" class="btn btn-success">Add to watchlist</button>
+                {% endif %}
+            </form>
+
+            {%endif%}
+
+        </div>
+    </div>
+</div>
+{% empty %}
+    <p>No listings in your watchlist.</p>
+{% endfor %}
+    
+{% endblock %}
