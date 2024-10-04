@@ -1,0 +1,13 @@
+i{
+    font-size: 1.2rem;
+}
+
+.card-footer{
+    background-color: white;
+    border: none;
+}
+
+.post-actions{
+    display: flex;
+    justify-content: space-between;
+}
