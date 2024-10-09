@@ -1,11 +1,41 @@
-import { Create, Show } from "../network/fetchs.js/";
+import { Create, Show, SpecificUser, loadFollowingPosts } from "../network/fetchs.js/";
 
 document.addEventListener("DOMContentLoaded", function() {
+
+    document.querySelector("#user-space").style.display = "none";
+
+    const followingLink = document.querySelector("#followingPage");
+    if (followingLink) {
+        followingLink.addEventListener("click", (event) => {
+            event.preventDefault(); 
+            
+            loadFollowingPosts().then(data => {
+                data.forEach(post => {
+                    const postId = post.id;
+                    const userId = post.senderId;
+                    document.querySelector("#post-" + postId).addEventListener("click", function() {
+                        ShowUser(userId)
+                    })
+                })
+            });
+        });        
+    }
+
     document.querySelector("#CreatePost").addEventListener("submit", function(event) {
-        CreatePost(event);  // Pasar el evento aquí
+        CreatePost(event);
+    });
+
+    Show().then(posts => {
+        posts.forEach(postdata => {
+            const postId = postdata.id;
+            const userId = postdata.senderId;
+            document.querySelector("#post-" + postId).addEventListener("click", function() {
+                ShowUser(userId);
+            });
+        });
     });
     
-    Show()
+
 });
 
 function CreatePost(event){
@@ -29,4 +59,11 @@ function CreatePost(event){
     document.querySelector("#privacy").value = 'PU';
     document.querySelector("#images").value = '';
 
+}
+
+function ShowUser(id) {
+    document.querySelector("#post-space").style.display = "none"
+    document.querySelector("#user-space").style.display ="block"
+
+    SpecificUser(id)
 }

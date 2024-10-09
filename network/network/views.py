@@ -5,9 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from itsdangerous import Serializer
+from django.core.paginator import Paginator
 
 from .models import Notification, Post, PostImages, User
 
@@ -67,6 +67,9 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
+
+
+@login_required
 def CreatePost(request):
     
     if request.method == "POST":
@@ -100,10 +103,80 @@ def CreatePost(request):
 def ShowPosts(request):
     if request.method == "GET":
         try:
-            # Obtener todos los posts
-            allPosts = Post.objects.all().order_by("-timeData")  # Cambia "timestamp" a "timeData"
-            serialized_posts = [post.serialize() for post in allPosts]  # Asegúrate de que serialize esté definido
-            return JsonResponse(serialized_posts, safe=False)  # Safe=False para listas
+            
+            allPosts = Post.objects.all().order_by("-timeData") 
+            serialized_posts = [post.serialize() for post in allPosts] 
+
+            page_number = request.GET.get('page', 1) 
+            paginator = Paginator(serialized_posts, 10)  
+            page_obj = paginator.get_page(page_number)
+
+            return JsonResponse({
+                'posts': page_obj.object_list,
+                'has_next': page_obj.has_next(),
+                'has_previous': page_obj.has_previous(),
+                'current_page': page_obj.number,
+                'total_pages': paginator.num_pages
+            }, safe=False)
+
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid method'}, status=405)
+
+def ShowUser(request, id):
+    user = get_object_or_404(User, id=id)
+    is_following = user.followers.filter(id=request.user.id).exists()
+
+    user_data = {
+        "id": user.id,
+        "name": user.username,
+        "email": user.email,
+        "followers": list(user.followers.values_list('username', flat=True)),
+        "following": list(user.following.values_list('username', flat=True)),
+        'is_following': is_following,
+        "posts": [post.serialize() for post in user.userPost.all()]
+    }
+    
+    return JsonResponse(user_data)
+
+@login_required
+def followUser(request, userid):
+    try:
+        follower = request.user
+        user = get_object_or_404(User, id=userid)
+
+        if request.method == "POST":
+            if follower == user:
+                return JsonResponse({'error': 'You cannot follow yourself.'}, status=400)
+
+        if user.followers.filter(id=follower.id).exists():
+            user.followers.remove(follower)
+            return JsonResponse({'success': f'You have unfollowed {user.username}.', 
+                                'following': False, 
+                                'followersCount': user.followers.count(), 
+                                'followingCount': user.following.count()})
+        else:
+            user.followers.add(follower)
+            return JsonResponse({'success': f'You are now following {user.username}.', 
+                                'following': True, 
+                                'followersCount': user.followers.count(), 
+                                'followingCount': user.following.count()})
+
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def ShowFollowingPosts(request):
+    if request.method == "GET":
+        try:
+            user = request.user
+            following_users = user.following.all()
+            following_posts = Post.objects.filter(sender__in=following_users).order_by("-timeData")
+            
+            serialized_posts = [post.serialize() for post in following_posts] 
+            return JsonResponse(serialized_posts, safe=False)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
     return JsonResponse({'error': 'Invalid method'}, status=405)

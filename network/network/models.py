@@ -23,8 +23,9 @@ class Post(models.Model):
         return {
             "id": self.id,
             "sender": self.sender.username,
+            "senderId": self.sender.id,
             "postText": self.postText,
-            "timeData": self.timeData.isoformat(),
+            "timeData": self.timeData.strftime('%B %d, %Y, %I:%M %p'),
             "privacy": self.privacity,
             "images": [image.image.url for image in self.images.all()], 
             "likes": self.like.count(),
