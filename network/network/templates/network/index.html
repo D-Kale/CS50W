@@ -14,16 +14,10 @@
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data" id="CreatePost">
                         {% csrf_token %}
+
+                        <input type="hidden" id="post-id" value="">
                         
                         <textarea id="content" placeholder="What's happening?" class="form-control mb-2"></textarea>
-                        
-                        <select id="privacy" class="form-control mb-2">
-                            <option value="PU">Public</option>
-                            <option value="FR">Just friends</option>
-                            <option value="PR">Private</option>
-                        </select>
-                    
-                        <input type="file" id="images" class="form-control-file mb-2" multiple>
                     
                         <button type="submit" class="btn btn-primary btn-block">Post</button>
                     </form>

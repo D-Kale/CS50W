@@ -58,7 +58,7 @@ export function fetchData(url, method = "GET") {
     });
 }
 
-export function renderPost(post) {
+export function renderPost(post, currentUser) {
     return `
     <div class="card mb-4">
         <div class="card-header">
@@ -73,20 +73,27 @@ export function renderPost(post) {
         </div>
         <div class="card-footer">
             <div class="post-actions">
-                <button class="btn">
-                    <i class="bi bi-suit-heart"></i> ${post.likes}
+                <button class="btn" id="like-post-${post.id}">
+                    <i class="bi bi-suit-heart"></i> <span id="like-count-${post.id}">${post.likes}</span>
                 </button>
                 <button class="btn">
                     <i class="bi bi-chat"></i>
                 </button>
-                <button class="btn">
-                    <i class="bi bi-reply-fill"></i>
-                </button>
+                ${currentUser === post.sender ? `
+                    <button class="btn edit-post" id="edit-post-${post.id}" data-id="${post.id}">
+                        <i class="bi bi-pencil"></i> Edit
+                    </button>
+                ` : `
+                    <button class="btn">
+                        <i class="bi bi-reply-fill"></i>
+                    </button>
+                `}
             </div>
         </div>
     </div>
     `;
 }
+
 
 let currentPage = 1;
 
@@ -96,23 +103,32 @@ export function updatePagination(data) {
 
     const totalPages = data.total_pages;
 
+    // Botón de página anterior
     if (data.has_previous) {
-        paginationContainer.innerHTML += `
-            <button class="btn btn-primary" onclick="Show(${currentPage - 1})">Previous</button>
-        `;
+        const prevButton = document.createElement('button');
+        prevButton.className = 'btn btn-primary mx-2';
+        prevButton.textContent = 'Previous';
+        prevButton.addEventListener('click', () => Show(currentPage - 1));
+        paginationContainer.appendChild(prevButton);
     }
 
-    if (totalPages > 1){
+    // Botones de páginas numeradas
+    if (totalPages > 1) {
         for (let page = 1; page <= totalPages; page++) {
-            paginationContainer.innerHTML += `
-                <button class="btn ${page === currentPage ? 'btn-secondary' : 'btn-primary'}" onclick="Show(${page})">${page}</button>
-            `;
+            const pageButton = document.createElement('button');
+            pageButton.className = `btn ${page === currentPage ? 'btn-secondary' : 'btn-primary'} mx-2`;
+            pageButton.textContent = page;
+            pageButton.addEventListener('click', () => Show(page));
+            paginationContainer.appendChild(pageButton);
         }
     }
 
+    // Botón de página siguiente
     if (data.has_next) {
-        paginationContainer.innerHTML += `
-            <button class="btn btn-primary" onclick="Show(${currentPage + 1})">Next</button>
-        `;
+        const nextButton = document.createElement('button');
+        nextButton.className = 'btn btn-primary mx-2';
+        nextButton.textContent = 'Next';
+        nextButton.addEventListener('click', () => Show(currentPage + 1));
+        paginationContainer.appendChild(nextButton);
     }
 }

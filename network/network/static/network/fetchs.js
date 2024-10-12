@@ -1,29 +1,27 @@
-import { follow, fetchData, updatePagination } from "../notRendered.js";
+import { follow, fetchData, updatePagination, renderPost } from "../notRendered.js";
 
 export function Show(page = 1) {
     return fetchData(`/api/posts?page=${page}`)
     .then(data => {
         const postsContainer = document.querySelector("#Posts");
-        postsContainer.innerHTML = ""
+        postsContainer.innerHTML = "";
 
         const postdata = data.posts;
+        const currentUser = data.current_user;
 
         postdata.forEach(post => {
-            postsContainer.innerHTML += renderPost(post)
-        })
-        
-        updatePagination(data)
+            postsContainer.innerHTML += renderPost(post, currentUser);
+        });
 
-        return postdata
-
-    })
+        updatePagination(data);
+        return postdata;
+    });
 }
 
 export function SpecificUser(id) {
     return fetchData(`/users/${id}`)
     .then(user => {
         const UserContainer = document.querySelector("#User");
-
         const userId = user.id;
 
         UserContainer.innerHTML = `
@@ -39,53 +37,79 @@ export function SpecificUser(id) {
                                 <span class="me-3"><strong id="followersCount">${user.followers.length}</strong> followers</span>
                                 <span><strong id="followingCount">${user.following.length}</strong> following</span>
                             </div>
-
                             
                             <form method="post" id="followUser">
                                 <button class="btn ${user.is_following ? 'btn-danger' : 'btn-primary'}" id="followBtn" data-following="${user.is_following}">
                                     ${user.is_following ? 'Unfollow' : 'Follow'}
                                 </button>
                             </form>
-
                         </div>
                     </div>
                 </div>
             </div>
-            
             <div>
                 <h1>Posts</h1>
-                <div id="userPosts"> </div>
+                <div id="userPosts"></div>
             </div>
         </div>
         `;
 
         user.posts = user.posts.reverse();
+        const currentUser = user.current_user;
+
+        const userPostsContainer = document.querySelector("#userPosts");
+        user.posts.forEach(post => {
+            userPostsContainer.innerHTML += renderPost(post, currentUser);
+        });
 
         user.posts.forEach(post => {
-            document.querySelector("#userPosts").innerHTML += renderPost(post);
+            const postId = post.id;
+
+            const likeButton = document.querySelector(`#like-post-${postId}`);
+            likeButton.addEventListener("click", () => {
+                LikePost(postId).then(() => {
+                    const likeCountElement = document.querySelector(`#like-count-${postId}`);
+                    if (likeCountElement) {
+                        likeCountElement.innerHTML = post.likes;
+                    }
+                });
+            });
+
+            const editButton = document.querySelector(`#edit-post-${postId}`);
+            if (editButton) {
+                editButton.addEventListener("click", function() {
+                    loadPostIntoForm(postId);
+                });
+            }
         });
 
         const followForm = document.querySelector('#followUser');
-        followForm.addEventListener('submit', (event) => { follow(event, userId); });
+        followForm.addEventListener('submit', (event) => { 
+            event.preventDefault();
+            follow(event, userId);
+        });
+
+        return user.posts;
     });
 }
 
 export function loadFollowingPosts() {
     return fetchData("/api/following-posts")
     .then(data => {
-
+        const postdata = data.posts;
         const postsContainer = document.querySelector("#Posts");
 
-        document.querySelector("#post-space").style.display = "block"
-        document.querySelector("#user-space").style.display ="none"
+        document.querySelector("#post-space").style.display = "block";
+        document.querySelector("#user-space").style.display = "none";
 
         postsContainer.innerHTML = "";
+        const currentUser = data.current_user;
 
-        if (data.length > 0) {
-            data.forEach(post => {
-                postsContainer.innerHTML += renderPost(post)
+        if (postdata.length > 0) {
+            postdata.forEach(post => {
+                postsContainer.innerHTML += renderPost(post, currentUser);
             });
-            return data
+            return postdata;
         } else {
             postsContainer.innerHTML = "<p>No posts from users you follow.</p>";
         }
@@ -93,7 +117,7 @@ export function loadFollowingPosts() {
     .catch(error => console.error('Error:', error));
 }
 
-export function Create(formData){
+export function Create(formData) {
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     fetch("/api/createPost", {
@@ -112,32 +136,72 @@ export function Create(formData){
     });
 }
 
-function renderPost(post) {
-    return `
-    <div class="card mb-4">
-        <div class="card-header">
-            <div class="post-header">
-                <span class="font-weight-bold" id="post-${post.id}">@${post.sender}</span>
-            </div>
-        </div>
-        <div class="card-body pb-0">
-            <p class="mb-0">${post.postText}</p>
-            <br>
-            <p class="mb-0">${post.timeData}</p>
-        </div>
-        <div class="card-footer">
-            <div class="post-actions">
-                <button class="btn">
-                    <i class="bi bi-suit-heart"></i> ${post.likes}
-                </button>
-                <button class="btn">
-                    <i class="bi bi-chat"></i>
-                </button>
-                <button class="btn">
-                    <i class="bi bi-reply-fill"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-    `;
+export function EditPost(formData, postId) {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch(`/api/editPost/${postId}`, {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result);
+        if (result.message) {
+            console.log("Post updated successfully.");
+        } else if (result.error) {
+            console.log(`Error: ${result.error}`);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
 }
+
+export function LikePost(postid) {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    return fetch(`/likepost/${postid}`, {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const likeButton = document.querySelector(`#like-post-${postid}`);
+        const likeCountElement = document.querySelector(`#like-count-${postid}`);
+
+        if (!data.liked) {
+            likeButton.innerHTML = `<i class="bi bi-suit-heart-fill"></i> ${data.likes}`;
+            likeButton.classList.remove('btn-outline-primary');
+            likeButton.classList.add('btn-danger');
+        } else {
+            likeButton.innerHTML = `<i class="bi bi-suit-heart"></i> ${data.likes}`;
+            likeButton.classList.remove('btn-danger');
+            likeButton.classList.add('btn-outline-primary');
+        }
+
+        if (likeCountElement) {
+            likeCountElement.innerHTML = data.likes;
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+
+export function setupLikeButtons() {
+    document.addEventListener('click', function(event) {
+        if (event.target.matches('[id^="like-post-"]')) {
+            const postId = event.target.id.split('-')[2];
+            LikePost(postId);
+        }
+    });
+}
+
+
+
+window.Show = Show;
