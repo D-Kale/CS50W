@@ -86,6 +86,7 @@ function loadPostIntoForm(postId) {
     fetch(`/api/posts/${postId}`)
         .then(response => response.json())
         .then(post => {
+            document.querySelector("#BlockPostText").innerHTML = "Edit Post"
             document.querySelector("#post-id").value = post.id;
             document.querySelector("#content").value = post.postText;
         })

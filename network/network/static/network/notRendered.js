@@ -76,18 +76,12 @@ export function renderPost(post, currentUser) {
                 <button class="btn" id="like-post-${post.id}">
                     <i class="bi bi-suit-heart"></i> <span id="like-count-${post.id}">${post.likes}</span>
                 </button>
-                <button class="btn">
-                    <i class="bi bi-chat"></i>
-                </button>
                 ${currentUser === post.sender ? `
                     <button class="btn edit-post" id="edit-post-${post.id}" data-id="${post.id}">
                         <i class="bi bi-pencil"></i> Edit
                     </button>
-                ` : `
-                    <button class="btn">
-                        <i class="bi bi-reply-fill"></i>
-                    </button>
-                `}
+                ` : ` `
+                }
             </div>
         </div>
     </div>
@@ -103,7 +97,6 @@ export function updatePagination(data) {
 
     const totalPages = data.total_pages;
 
-    // Botón de página anterior
     if (data.has_previous) {
         const prevButton = document.createElement('button');
         prevButton.className = 'btn btn-primary mx-2';
@@ -112,7 +105,6 @@ export function updatePagination(data) {
         paginationContainer.appendChild(prevButton);
     }
 
-    // Botones de páginas numeradas
     if (totalPages > 1) {
         for (let page = 1; page <= totalPages; page++) {
             const pageButton = document.createElement('button');
@@ -123,7 +115,6 @@ export function updatePagination(data) {
         }
     }
 
-    // Botón de página siguiente
     if (data.has_next) {
         const nextButton = document.createElement('button');
         nextButton.className = 'btn btn-primary mx-2';

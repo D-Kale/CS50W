@@ -148,6 +148,7 @@ export function EditPost(formData, postId) {
     })
     .then(response => response.json())
     .then(result => {
+        document.querySelector("#BlockPostText").innerHTML = "Create Post"
         console.log(result);
         if (result.message) {
             console.log("Post updated successfully.");
