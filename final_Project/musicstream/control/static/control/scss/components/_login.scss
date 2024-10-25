@@ -1,0 +1,56 @@
+$primary-color: #00796b;
+$secondary-color: #b2dfdb;
+$background-color: #e0f2f1;
+
+body {
+    background-color: $background-color;
+}
+
+.card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    
+    .card-body {
+        padding: 2rem;
+    }
+    
+    .card-title {
+        color: $primary-color;
+        font-weight: bold;
+    }
+}
+
+.form-control {
+    border-radius: 0.5rem;
+    
+    &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+    }
+}
+
+.btn-primary {
+    background-color: $primary-color;
+    border-color: $primary-color;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        background-color: darken($primary-color, 10%);
+        border-color: darken($primary-color, 10%);
+    }
+}
+
+#switchForm {
+    color: $secondary-color;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    
+    &:hover {
+        color: $primary-color;
+    }
+}

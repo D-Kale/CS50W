@@ -1,0 +1,182 @@
+body {
+  background-color: #e0f2f1;
+}
+
+.card {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+.card .card-body {
+  padding: 2rem;
+}
+.card .card-title {
+  color: #00796b;
+  font-weight: bold;
+}
+
+.form-control {
+  border-radius: 0.5rem;
+}
+.form-control:focus {
+  border-color: #00796b;
+  box-shadow: 0 0 0 0.2rem rgba(0, 121, 107, 0.25);
+}
+
+.btn-primary {
+  background-color: #00796b;
+  border-color: #00796b;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  background-color: #00463e;
+  border-color: #00463e;
+}
+
+#switchForm {
+  color: #b2dfdb;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+#switchForm:hover {
+  color: #00796b;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+h1, h2 {
+  color: #00796b;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.tabs .tab-button {
+  background-color: #b2dfdb;
+  border: none;
+  padding: 12px 25px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  border-radius: 5px 5px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+.tabs .tab-button:hover {
+  background-color: #8ed0ca;
+  transform: translateY(-2px);
+}
+.tabs .tab-button.active {
+  background-color: #00796b;
+  color: #ffffff;
+  transform: translateY(-4px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tab-content {
+  display: none;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+.tab-content.active {
+  display: block;
+  opacity: 1;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #000100;
+  font-weight: 500;
+}
+.form-group input[type=text],
+.form-group input[type=file],
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #b2dfdb;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border 0.3s;
+}
+.form-group input[type=text]:focus,
+.form-group input[type=file]:focus,
+.form-group select:focus {
+  border-color: #00796b;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 121, 107, 0.3);
+}
+
+.My_button {
+  background-color: #00796b;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.My_button:hover {
+  background-color: #00463e;
+  transform: translateY(-3px);
+}
+.My_button:active {
+  transform: translateY(1px);
+}
+
+.list {
+  list-style-type: none;
+  padding: 0;
+}
+.list li {
+  background-color: #f5f5f5;
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.list li button {
+  margin-left: 10px;
+}
+
+.checkbox-group {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #b2dfdb;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+}
+.checkbox-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #001a16;
+}
+.checkbox-group input[type=checkbox] {
+  margin-right: 10px;
+}/*# sourceMappingURL=index.css.map */

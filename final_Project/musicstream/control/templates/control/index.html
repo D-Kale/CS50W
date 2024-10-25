@@ -1,0 +1,72 @@
+{% extends 'control/layout.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<h1 class="mb-2 text-center fw-bold">Administración de Música</h1>
+
+    <div class="tabs d-flex justify-content-center mb-4">
+        <button class="tab-button active me-2" data-tab="songs">Canciones</button>
+        <button class="tab-button" data-tab="playlists">Playlists</button>
+    </div>
+
+    <div id="songs" class="tab-content active mb-5">
+        <h2 class="mb-2 text-center fw-bold">Administrar Canciones</h2>
+        <form id="songForm">
+            <input type="hidden" id="songId">
+            <div class="form-group">
+                <label for="songName">Nombre de la canción:</label>
+                <input type="text" id="songName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="songArtist">Artista:</label>
+                <input type="text" id="songArtist" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="songFile">Archivo de audio:</label>
+                <input type="file" id="songFile" class="form-control" accept="audio/*">
+            </div>
+            <div class="form-group">
+                <label for="songState">Estado:</label>
+                <select id="songState" class="form-select">
+                    <option value="nPU">No publicado</option>
+                    <option value="PUB">Publicado</option>
+                    <option value="PRI">Privado</option>
+                </select>
+            </div>
+            <button type="submit" class="My_button">Guardar Canción</button>
+        </form>
+        <ul id="songList" class="list"></ul>
+    </div>
+
+    <div id="playlists" class="tab-content mb-5">
+        <h2>Administrar Playlists</h2>
+        <form id="playlistForm">
+            <input type="hidden" id="playlistId">
+            <div class="form-group">
+                <label for="playlistName">Nombre de la playlist:</label>
+                <input type="text" id="playlistName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="playlistState">Estado:</label>
+                <select id="playlistState" class="form-select">
+                    <option value="nPU">No publicado</option>
+                    <option value="PUB">Publicado</option>
+                    <option value="PRI">Privado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Canciones:</label>
+                <div id="playlistSongs" class="checkbox-group"></div>
+            </div>
+            <button type="submit" class="My_button">Guardar Playlist</button>
+        </form>
+        <ul id="playlistList" class="list"></ul>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'control/index.js' %}"></script>
+{% endblock %}
