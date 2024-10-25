@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def CreateSong(request):
     if request.method == "POST":
+        user = request.user
         name = request.POST.get("name")
         state = request.POST.get("state")
         artist = request.POST.get("artist")
@@ -24,6 +25,7 @@ def CreateSong(request):
             duration = timedelta(seconds=duration_seconds)
 
             new_song = Song(
+                user=user,
                 name=name,
                 state=state,
                 artist=artist,
@@ -99,7 +101,7 @@ def CreatePlaylist(request):
             if not name or not song_ids:
                 return JsonResponse({'error': 'Todos los campos son requeridos.'}, status=400)
 
-            user = CustomUser.objects.get(username="Admin")
+            user = request.user
 
             songs = Song.objects.filter(id__in=song_ids)
 
