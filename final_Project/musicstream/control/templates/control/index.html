@@ -14,7 +14,7 @@
     <div id="songs" class="tab-content active mb-5">
         <h2 class="mb-2 text-center fw-bold">Administrar Canciones</h2>
         <form id="songForm">
-            <input type="hidden" id="songId">
+            {% csrf_token %} 
             <div class="form-group">
                 <label for="songName">Nombre de la canción:</label>
                 <input type="text" id="songName" class="form-control" required>
@@ -25,18 +25,18 @@
             </div>
             <div class="form-group">
                 <label for="songFile">Archivo de audio:</label>
-                <input type="file" id="songFile" class="form-control" accept="audio/*">
+                <input type="file" id="songFile" class="form-control" accept="audio/*" required>
             </div>
             <div class="form-group">
                 <label for="songState">Estado:</label>
-                <select id="songState" class="form-select">
+                <select id="songState" class="form-select" required>
                     <option value="nPU">No publicado</option>
-                    <option value="PUB">Publicado</option>
-                    <option value="PRI">Privado</option>
+                    <option value="PU">Publicado</option>
                 </select>
             </div>
             <button type="submit" class="My_button">Guardar Canción</button>
         </form>
+        
         <ul id="songList" class="list"></ul>
     </div>
 
@@ -52,8 +52,7 @@
                 <label for="playlistState">Estado:</label>
                 <select id="playlistState" class="form-select">
                     <option value="nPU">No publicado</option>
-                    <option value="PUB">Publicado</option>
-                    <option value="PRI">Privado</option>
+                    <option value="PU">Publicado</option>
                 </select>
             </div>
             <div class="form-group">
@@ -68,5 +67,5 @@
 {% endblock %}
 
 {% block script %}
-<script src="{% static 'control/index.js' %}"></script>
+<script type="module" src="{% static 'control/index.js' %}"></script>
 {% endblock %}

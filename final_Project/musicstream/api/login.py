@@ -5,7 +5,6 @@ from django.db import IntegrityError
 import json
 from .models import CustomUser
 
-@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
         try:
@@ -28,7 +27,6 @@ def login_view(request):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-@csrf_exempt
 def logout_view(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
@@ -38,7 +36,6 @@ def logout_view(request):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-@csrf_exempt
 def register(request):
     if request.method == "POST":
         try:

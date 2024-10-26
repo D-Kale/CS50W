@@ -6,15 +6,19 @@ from .models import *
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt
 def CreateSong(request):
     if request.method == "POST":
         user = request.user
+        
+        # Verificar si el usuario está autenticado
+        if user.is_anonymous:
+            return JsonResponse({'error': 'Usuario no autenticado.'}, status=401)
+
         name = request.POST.get("name")
         state = request.POST.get("state")
         artist = request.POST.get("artist")
         file = request.FILES.get("file")
-        
+
         if not name or not artist or not file:
             return JsonResponse({'error': 'Todos los campos son requeridos.'}, status=400)
 
@@ -33,6 +37,7 @@ def CreateSong(request):
                 duration=duration
             )
 
+            new_song.full_clean()  # Esto validará el modelo antes de guardarlo
             new_song.save()
 
             song_data = new_song.serializer()
@@ -42,12 +47,16 @@ def CreateSong(request):
                 'song': song_data
             }, status=201)
 
+        except ValidationError as e:
+            return JsonResponse({'error': str(e)}, status=400)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            # Imprime el error en la consola para depuración
+            print("Error al guardar la canción:", e)
+            return JsonResponse({'error': 'Ocurrió un error al crear la canción.'}, status=500)
 
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
 
-@csrf_exempt
+
 def EditSong(request, songId):
     if request.method == "POST":
         song = get_object_or_404(Song, id=songId)

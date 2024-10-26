@@ -29,7 +29,7 @@ class CustomUser(AbstractUser):
     type = models.CharField(max_length=10, choices=USERTYPES, default="User")
 
 class Song(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, default=None)
     name = models.CharField(max_length=500)
     state = models.CharField(max_length=3, choices=STATES, default="nPU")
     artist = models.CharField(max_length=50, blank=True)

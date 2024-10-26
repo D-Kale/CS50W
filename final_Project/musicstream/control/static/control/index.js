@@ -1,20 +1,36 @@
+import { CreateSong } from "./fetch.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
-    const songList = document.getElementById('songList');
-    const playlistList = document.getElementById('playlistList');
-    const playlistSongs = document.getElementById('playlistSongs');
+    const songList = document.querySelector('#songList');
+    const playlistList = document.querySelector('#playlistList');
+    const playlistSongs = document.querySelector('#playlistSongs');
+
+    const songForm = document.querySelector("#songForm");
 
     let songs = [];
     let playlists = [];
 
-    // Cambio de pestañas
+    songForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append("name", document.querySelector("#songName").value);
+        formData.append("artist", document.querySelector("#songArtist").value);
+        formData.append("file", document.querySelector("#songFile").files[0]);
+        formData.append("state", document.querySelector("#songState").value);
+
+        CreateSong(formData);
+    });
+
+    // Funcionalidad de pestañas
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             tabButtons.forEach(btn => btn.classList.remove('active'));
             tabContents.forEach(content => content.classList.remove('active'));
             button.classList.add('active');
-            document.getElementById(button.dataset.tab).classList.add('active');
+            document.querySelector(`#${button.dataset.tab}`).classList.add('active');
         });
     });
 
