@@ -14,16 +14,17 @@
     <div id="songs" class="tab-content active mb-5">
         <h2 class="mb-2 text-center fw-bold">Administrar Canciones</h2>
         <form id="songForm">
+            <input type="hidden" id="songId">
             {% csrf_token %} 
             <div class="form-group">
                 <label for="songName">Nombre de la canción:</label>
                 <input type="text" id="songName" class="form-control" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="form-artist">
                 <label for="songArtist">Artista:</label>
                 <input type="text" id="songArtist" class="form-control" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="form-files">
                 <label for="songFile">Archivo de audio:</label>
                 <input type="file" id="songFile" class="form-control" accept="audio/*" required>
             </div>
@@ -37,7 +38,7 @@
             <button type="submit" class="My_button">Guardar Canción</button>
         </form>
         
-        <ul id="songList" class="list"></ul>
+        <ul id="songList" class="list mt-3"></ul>
     </div>
 
     <div id="playlists" class="tab-content mb-5">
@@ -61,7 +62,7 @@
             </div>
             <button type="submit" class="My_button">Guardar Playlist</button>
         </form>
-        <ul id="playlistList" class="list"></ul>
+        <ul id="playlistList" class="list mt-3"></ul>
     </div>
 
 {% endblock %}

@@ -1,3 +1,5 @@
+import { ChangeUserType } from "./fetch.js";
+
 let isLoginForm = true;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,6 +14,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (params.get('show') === 'register') {
         isLoginForm = false; // Cambia a registro
     }
+
+
+    formTitle.addEventListener('click', (e) => {
+        ChangeUserType()
+        .then(data => {
+            errorMessage.classList.remove("d-none");
+            errorMessage.classList.remove("alert-danger")
+            errorMessage.classList.add("alert-success")
+            errorMessage.innerHTML = `Tu usuario ahora es ${data.type}`;
+        })
+        .catch(error => {
+            console.error("Hubo un problema con la solicitud:", error);
+            errorMessage.classList.remove("d-none");
+            errorMessage.innerHTML = "No se pudo cambiar el tipo de usuario.";
+        });
+        errorMessage.classList.remove("alert-success")
+        errorMessage.classList.add("alert-danger")
+        errorMessage.classList.add("d-none")
+    });
+    
 
     UpdateView();
 
@@ -55,6 +77,8 @@ function clearError() {
 
 
 function login() {
+    const errorMessage = document.querySelector('#error-message');
+
     const username = document.querySelector('#login-username').value;
     const password = document.querySelector('#login-password').value;
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -80,12 +104,14 @@ function login() {
         window.location.href = '/control/';
     })
     .catch((err) => {
-        showError(err.message);
+        errorMessage.classList.remove('d-none')
+        errorMessage.innerHTML = `err.message`;
     });
 }
 
 
 function register() {
+    const errorMessage = document.querySelector('#error-message');
     const username = document.querySelector('#register-username').value;
     const email = document.querySelector('#register-email').value;
     const password = document.querySelector('#register-password').value;
@@ -93,7 +119,8 @@ function register() {
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     if (password !== confirmation) {
-        showError('Las contraseñas no coinciden.');
+        errorMessage.classList.remove('d-none')
+        errorMessage.innerHTML = 'Las contraseñas no coinciden.';
         return;
     }
 
@@ -116,14 +143,4 @@ function register() {
     .then((data) => {
         window.location.href = '/control/';
     })
-    .catch((err) => {
-        showError(err.message);
-    }); 
-}
-
-
-function showError(message) {
-    const errorContainer = document.querySelector('#error-container');
-    errorContainer.textContent = message;
-    errorContainer.classList.remove('d-none');
 }

@@ -5,15 +5,13 @@ from .models import *
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import  login_required
 
+@login_required
 def CreateSong(request):
     if request.method == "POST":
         user = request.user
         
-        # Verificar si el usuario está autenticado
-        if user.is_anonymous:
-            return JsonResponse({'error': 'Usuario no autenticado.'}, status=401)
-
         name = request.POST.get("name")
         state = request.POST.get("state")
         artist = request.POST.get("artist")
@@ -21,6 +19,10 @@ def CreateSong(request):
 
         if not name or not artist or not file:
             return JsonResponse({'error': 'Todos los campos son requeridos.'}, status=400)
+
+        if user.type != "SupUser":
+            return JsonResponse({'error': "user don't have permission to enter new songs"}, status=403)
+
 
         try:
             saved_file_path = SaveSong(file)
@@ -83,18 +85,22 @@ def EditSong(request, songId):
 
     return JsonResponse({"error": "Método no permitido."}, status=405)
 
-def ShowSongs(request):
+
+
+def ShowSongs(request, songid=None):  # Establecer un valor por defecto para songid
     if request.method == "GET":
+        if songid is not None:  # Verificar que songid no sea None
+            try:
+                song = Song.objects.get(id=songid)
+                song_data = song.serializer()  # Usa song_data para mantener consistencia
+                return JsonResponse({'song': song_data}, status=200)  # Retorna una sola canción
+            except Song.DoesNotExist:
+                return JsonResponse({'error': 'Canción no encontrada.'}, status=404)
 
+        # Si no se especifica songid, devolver todas las canciones
         all_songs = Song.objects.all()
-
-        songs_data = []
-        for song in all_songs:
-            song = song.serializer()
-
-            songs_data.append(song)
-
-        return JsonResponse({'songs': songs_data}, status=200, safe=False)
+        songs_data = [song.serializer() for song in all_songs]  # List comprehension para simplificar
+        return JsonResponse({'songs': songs_data}, status=200)
 
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
 

@@ -44,6 +44,7 @@ class Song(models.Model):
     
     def serializer(self):
         return {
+            'user': self.user.username,
             'id': self.id,
             'name': self.name,
             'state': self.state,

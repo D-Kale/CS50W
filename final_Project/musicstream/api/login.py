@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+
+from django.contrib.auth.decorators import  login_required
+
 from django.db import IntegrityError
 import json
 from .models import CustomUser
@@ -63,3 +65,32 @@ def register(request):
         return JsonResponse({"message": "User registered successfully"}, status=201)
     
     return JsonResponse({"error": "Method not allowed"}, status=405)
+
+@login_required
+def CurrentUser(request):
+    user = request.user
+    return JsonResponse({
+        "username": user.username,
+        "id": user.id,
+        "type": user.type,
+        "email": user.email
+    })
+
+@login_required
+def SupUser(request):
+    if request.method == "POST":
+        user = request.user
+        
+        if user.type == "User":
+            user.type = "SupUser"
+        else:
+            user.type = "User"
+        
+        user.save()
+        
+        return JsonResponse({
+            "username": user.username,
+            "id": user.id,
+            "type": user.type,
+            "email": user.email
+        })
