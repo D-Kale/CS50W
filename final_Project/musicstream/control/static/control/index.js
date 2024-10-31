@@ -18,7 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let songs = [];
     let playlists = [];
+    
+    let removeSongs = []; // Para las canciones que se eliminarán
+    let selectedSongs = []; // Declarar selectedSongs aquí
 
+    // Al editar la playlist
     playlistForm.addEventListener("submit", (event) => {
         event.preventDefault();
         
@@ -26,13 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('name', document.querySelector('#playlistName').value);
         formData.append('state', document.querySelector('#playlistState').value);
         
-        // Aquí, en lugar de crear un nuevo array, simplemente usamos selectedSongs
-        selectedSongs.forEach(songId => formData.append('songs', songId));
-    
+        selectedSongs.forEach(songId => formData.append('add_songs', songId)); // Agregar canciones
+        removeSongs.forEach(songId => formData.append('remove_songs', songId)); // Eliminar canciones
+
         if (isEditingPlaylist) {
             EditPlaylist(editingPlaylistId, formData).then(() => {
                 isEditingPlaylist = false;
                 editingPlaylistId = null;
+                selectedSongs = []; // Reiniciar la selección
+                removeSongs = []; // Reiniciar removeSongs
                 renderPlaylists();
             });
         } else {
@@ -192,28 +198,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Renderizar canciones en la sección de playlists
-    function renderPlaylistSongs(selectedSongs = []) {
+
+    // Dentro de la función renderPlaylistSongs
+    function renderPlaylistSongs(existingSongs = []) {
         const searchInput = document.querySelector('#searchSong');
         const playlistSongsContainer = document.querySelector('#playlistSongs');
-    
+
         const updateSongList = (searchTerm = '') => {
             playlistSongsContainer.innerHTML = '';
-    
+
             getAllSongs().then((response) => {
-                const songs = response.songs || []; // Asegúrate de que sea un array
-    
+                const songs = response.songs || [];
+
                 const filteredSongs = songs.filter(song => 
                     song.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
-    
+
                 filteredSongs.forEach(song => {
                     const div = document.createElement('div');
-                    div.className = 'btn-group me-2'; // Clase de Bootstrap para el grupo de botones
-    
-                    const isChecked = selectedSongs.includes(song.id) ? 'checked' : '';
+                    div.className = 'btn-group me-2';
+
+                    const isChecked = selectedSongs.includes(song.id) || existingSongs.includes(song.id) ? 'checked' : '';
                     const activeClass = isChecked ? 'active' : '';
-    
+
                     div.innerHTML = `
                         <input type="checkbox" class="btn-check" id="btncheck-${song.id}" autocomplete="off" ${isChecked}>
                         <label class="btn btn-outline-primary ${activeClass}" for="btncheck-${song.id}">
@@ -221,14 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         </label>
                     `;
                     playlistSongsContainer.appendChild(div);
-    
-                    // Agregar evento para manejar el cambio de estado del checkbox
+
                     const checkbox = div.querySelector('input[type="checkbox"]');
                     checkbox.addEventListener('change', () => {
                         if (checkbox.checked) {
-                            selectedSongs.push(song.id); // Agregar a la lista si está marcado
+                            selectedSongs.push(song.id);
+                            removeSongs = removeSongs.filter(id => id !== song.id); // Eliminar de removeSongs si se agrega
                         } else {
-                            selectedSongs = selectedSongs.filter(id => id !== song.id); // Eliminar si se desmarca
+                            selectedSongs = selectedSongs.filter(id => id !== song.id); // Eliminar de selectedSongs si se desmarca
+                            removeSongs.push(song.id); // Agregar a removeSongs si se desmarca
                         }
                     });
                 });
@@ -236,17 +244,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Error al obtener las canciones:', error);
             });
         };
-    
-        // Actualizar la lista cada vez que el usuario escribe en el campo de búsqueda
+
         searchInput.addEventListener('input', (e) => {
             updateSongList(e.target.value);
         });
-    
-        // Llamar la función para cargar todas las canciones inicialmente
+
         updateSongList();
     }
-    
-        
+
     // Inicialización
     renderSongs();
     renderPlaylists();
