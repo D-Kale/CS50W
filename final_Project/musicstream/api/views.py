@@ -147,20 +147,23 @@ def CreatePlaylist(request):
 
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
 
-def ShowPlaylist(request):
+def ShowPlaylist(request, playlistId=None):  # Establecer un valor por defecto para playlist_id
     if request.method == "GET":
+        if playlistId is not None:  # Verificar que playlist_id no sea None
+            try:
+                playlist = Playlist.objects.get(id=playlistId)
+                playlist_data = playlist.serializer()  # Usa playlist_data para mantener consistencia
+                return JsonResponse({'playlist': playlist_data}, status=200)  # Retorna una sola playlist
+            except Playlist.DoesNotExist:
+                return JsonResponse({'error': 'Playlist no encontrada.'}, status=404)
 
+        # Si no se especifica playlist_id, devolver todas las playlists
         all_playlists = Playlist.objects.all()
-
-        playlist_data = []
-        for playlist in all_playlists:
-            playlist = playlist.serializer()
-
-            playlist_data.append(playlist)
-
-        return JsonResponse({'playlists': playlist_data}, status=200, safe=False)
+        playlists_data = [playlist.serializer() for playlist in all_playlists]  # List comprehension para simplificar
+        return JsonResponse({'playlists': playlists_data}, status=200)
 
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
+
 
 @csrf_exempt
 def delete_playlist(request, id):

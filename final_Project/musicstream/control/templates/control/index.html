@@ -35,7 +35,7 @@
                     <option value="PU">Publicado</option>
                 </select>
             </div>
-            <button type="submit" class="My_button">Guardar Canción</button>
+            <button type="submit" class="My_button" id="My_song">Guardar Canción</button>
         </form>
         
         <ul id="songList" class="list mt-3"></ul>
@@ -58,9 +58,14 @@
             </div>
             <div class="form-group">
                 <label>Canciones:</label>
-                <div id="playlistSongs" class="checkbox-group"></div>
+                
+                <div>
+                    <input type="text" id="searchSong" placeholder="Buscar canciones..." class="form-control mb-2">
+                    <div id="playlistSongs" class="checkbox-group"></div>
+                </div>                
+                
             </div>
-            <button type="submit" class="My_button">Guardar Playlist</button>
+            <button type="submit" class="My_button" id="My_playlist">Guardar Playlist</button>
         </form>
         <ul id="playlistList" class="list mt-3"></ul>
     </div>

@@ -71,6 +71,7 @@ class Playlist(models.Model):
     def serializer(self):
         return {
             'id': self.id,
+            'user': self.user.username,
             'name': self.name,
             'state': self.state,
             'likes': self.like.count(),

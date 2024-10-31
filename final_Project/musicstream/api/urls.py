@@ -11,6 +11,7 @@ urlpatterns = [
     path('create-playlist/', CreatePlaylist, name='create-playlist'),
     path('edit-playlist/<int:playlistID>', edit_playlist, name="edit-playlist"),
     path('playlist/', ShowPlaylist, name="playlists"),
+    path('playlist/<int:playlistId>', ShowPlaylist, name="playlist"),
     path('delete-playlist/<int:id>', delete_playlist, name="delete-playlist"),
 
 
