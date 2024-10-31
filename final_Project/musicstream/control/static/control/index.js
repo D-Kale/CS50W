@@ -1,4 +1,4 @@
-import { CreateSong, EditSong, getAllSongs, CreatePlaylist, EditPlaylist, getAllPlaylists } from "./fetch.js";
+import { CreateSong, EditSong, getAllSongs, CreatePlaylist, EditPlaylist, getAllPlaylists, DeletePlaylist } from "./fetch.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -22,6 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let removeSongs = []; // Para las canciones que se eliminarán
     let selectedSongs = []; // Declarar selectedSongs aquí
 
+    function defaultForm(){
+        document.querySelector('#songName').value = "";
+        document.querySelector('#songArtist').value = "";
+        document.querySelector('#songFile').value = "";
+        document.querySelector('#songState').value = "";
+    }
+
     // Al editar la playlist
     playlistForm.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -33,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedSongs.forEach(songId => formData.append('add_songs', songId)); // Agregar canciones
         removeSongs.forEach(songId => formData.append('remove_songs', songId)); // Eliminar canciones
 
+        selectedSongs.forEach(songId => formData.append('songs', songId)); // Añadir cada canción
+
+
         if (isEditingPlaylist) {
             EditPlaylist(editingPlaylistId, formData).then(() => {
                 isEditingPlaylist = false;
@@ -40,10 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedSongs = []; // Reiniciar la selección
                 removeSongs = []; // Reiniciar removeSongs
                 renderPlaylists();
+                defaultForm()
+                window.location.reload();
             });
         } else {
             CreatePlaylist(formData).then(() => {
                 renderPlaylists();
+                defaultForm()
             });
         }
     });
@@ -56,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append('name', document.querySelector('#songName').value);
         formData.append('state', document.querySelector('#songState').value);
+        formData.append('artist', document.querySelector('#songArtist').value);
 
         const fileInput = document.querySelector('#songFile').files[0];
         if (fileInput) {
@@ -68,11 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 isEditing = false;
                 editingSongId = null;
                 renderSongs();
+                defaultForm();
+                window.location.reload();
             });
         } else {
             // Si estamos creando, usa CreateSong
             CreateSong(formData).then(() => {
                 renderSongs();
+                defaultForm()
             });
         }
     });
@@ -171,12 +188,28 @@ document.addEventListener('DOMContentLoaded', () => {
             playlists.forEach(playlist => {
                 const li = document.createElement('li');
                 const button = document.createElement('button');
+                const deleteButton = document.createElement("button")
+                const div = document.createElement("div")
+
+                div.classList.add("w-25")
+
+                deleteButton.innerHTML = `Delete`
+                deleteButton.classList.add('btn', 'btn-danger', 'border', 'border-4')
 
                 li.innerHTML = `Playlist: ${playlist.name}`;
                 button.innerHTML = `Edit ${playlist.id}`;
                 button.classList.add('btn', 'btn-light', 'border', 'border-4');
 
+                div.appendChild(button)
+                div.appendChild(deleteButton)
+
                 // Manejador de clic para activar modo edición de playlist
+                deleteButton.addEventListener("click", () => {
+                    DeletePlaylist(playlist.id).then(
+                        window.location.reload()
+                    )
+                })
+
                 button.addEventListener('click', () => {
                     document.querySelector('#playlistName').value = playlist.name;
                     document.querySelector('#playlistState').value = playlist.state;
@@ -189,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     editingPlaylistId = playlist.id;
                 });
 
-                li.appendChild(button);
+                li.appendChild(div)
                 playlistList.appendChild(li);
             });
         })
@@ -223,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     div.innerHTML = `
                         <input type="checkbox" class="btn-check" id="btncheck-${song.id}" autocomplete="off" ${isChecked}>
-                        <label class="btn btn-outline-primary ${activeClass}" for="btncheck-${song.id}">
+                        <label class="btn btn-outline-primary ${activeClass}" for="btncheck-${song.id}" id="label-${song.id}">
                             ${song.name} - ${song.artist}
                         </label>
                     `;
@@ -237,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             selectedSongs = selectedSongs.filter(id => id !== song.id); // Eliminar de selectedSongs si se desmarca
                             removeSongs.push(song.id); // Agregar a removeSongs si se desmarca
+                            document.querySelector(`#label-${song.id}`).classList.remove("active")
                         }
                     });
                 });

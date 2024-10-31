@@ -1,0 +1,24 @@
+body {
+  background-color: #191414;
+  color: white;
+}
+
+.navbar {
+  background-color: #1DB954;
+}
+
+.song-item, .playlist-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+  transition: background-color 0.3s;
+}
+.song-item:hover, .playlist-item:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.like-btn {
+  cursor: pointer;
+  color: #1DB954;
+}/*# sourceMappingURL=styles.css.map */

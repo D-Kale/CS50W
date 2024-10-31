@@ -130,12 +130,12 @@ function register() {
             'Content-Type': 'application/json',
             'X-CSRFToken': csrftoken,
         },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ username, email, password, confirmation })
     })
     .then((response) => {
         if (!response.ok) {
             return response.json().then(data => {
-                throw new Error(data.error || 'Error desconocido');
+                throw new Error(data.error || 'Error desconocido'); 
             });
         }
         return response.json();

@@ -1,8 +1,10 @@
 from datetime import timedelta
+from django.conf import settings
 from django.shortcuts import get_object_or_404, render
 from .helpers import SaveSong, GetDuration
 from .models import *
 
+from django.core.files.storage import default_storage
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import  login_required
@@ -11,7 +13,7 @@ from django.contrib.auth.decorators import  login_required
 def CreateSong(request):
     if request.method == "POST":
         user = request.user
-        
+
         name = request.POST.get("name")
         state = request.POST.get("state")
         artist = request.POST.get("artist")
@@ -21,12 +23,13 @@ def CreateSong(request):
             return JsonResponse({'error': 'Todos los campos son requeridos.'}, status=400)
 
         if user.type != "SupUser":
-            return JsonResponse({'error': "user don't have permission to enter new songs"}, status=403)
-
+            return JsonResponse({'error': "User doesn't have permission to enter new songs"}, status=403)
 
         try:
-            saved_file_path = SaveSong(file)
-            duration_seconds = GetDuration(saved_file_path)
+            saved_file_name = SaveSong(file)  # Guarda el archivo y obtiene la ruta relativa
+            saved_file_path = default_storage.url(saved_file_name)  # Obtiene la URL del archivo guardado
+
+            duration_seconds = GetDuration(os.path.join(settings.MEDIA_ROOT, saved_file_name))  # Cambia a la ruta completa para obtener la duración
 
             duration = timedelta(seconds=duration_seconds)
 
@@ -35,11 +38,11 @@ def CreateSong(request):
                 name=name,
                 state=state,
                 artist=artist,
-                file=saved_file_path,
+                file=saved_file_name,  # Asigna la ruta relativa del archivo
                 duration=duration
             )
 
-            new_song.full_clean()  # Esto validará el modelo antes de guardarlo
+            new_song.full_clean()  # Validar el modelo antes de guardarlo
             new_song.save()
 
             song_data = new_song.serializer()
@@ -52,11 +55,11 @@ def CreateSong(request):
         except ValidationError as e:
             return JsonResponse({'error': str(e)}, status=400)
         except Exception as e:
-            # Imprime el error en la consola para depuración
             print("Error al guardar la canción:", e)
             return JsonResponse({'error': 'Ocurrió un error al crear la canción.'}, status=500)
 
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
+
 
 
 def EditSong(request, songId):
@@ -167,7 +170,7 @@ def ShowPlaylist(request, playlistId=None):  # Establecer un valor por defecto p
 
 @csrf_exempt
 def delete_playlist(request, id):
-    if request.method == "DELETE":
+    if request.method == "POST":
         playlist = get_object_or_404(Playlist, id=id)
         playlist.delete()
         return JsonResponse({'message': 'Playlist eliminada correctamente.'}, status=200)
@@ -206,6 +209,9 @@ def edit_playlist(request, playlistID):
 
 def like(request, type, id):
     user = request.user
+
+    if not user.is_authenticated:
+        return JsonResponse({"error": "Usuario no autenticado."}, status=401)
 
     if type == "Playlist":
         obj = get_object_or_404(Playlist, id=id)

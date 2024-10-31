@@ -3,7 +3,7 @@ from mutagen import File, MutagenError
 from django.conf import settings
 
 def SaveSong(song):
-    """Guarda el archivo de audio y retorna la ruta del archivo."""
+    """Guarda el archivo de audio y retorna la ruta relativa del archivo."""
     
     # Crea el directorio 'audios' si no existe
     upload_dir = os.path.join(settings.MEDIA_ROOT, 'audios')
@@ -32,7 +32,9 @@ def SaveSong(song):
         os.remove(file_path)  # Elimina el archivo si hay error
         raise ValueError("El archivo de audio está corrupto o no es válido.")
 
-    return file_path  # Retorna la ruta del archivo guardado
+    # Retorna la ruta relativa al directorio MEDIA_ROOT, eliminando el primer 'audios/' extra
+    relative_path = os.path.relpath(file_path, settings.MEDIA_ROOT)
+    return relative_path  # Retorna la ruta relativa del archivo guardado
 
 
 def GetDuration(file_path):

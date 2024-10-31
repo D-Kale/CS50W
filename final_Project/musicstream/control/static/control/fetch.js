@@ -33,7 +33,7 @@ export function CreateSong(formData) {
 
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    fetch('/api/upload/', {
+    return fetch('/api/upload/', {
         method: 'POST',
         body: formData,
         headers: {
@@ -151,4 +151,17 @@ export function EditPlaylist(playlistId, formData) {
     .catch((error) => {
         console.error('Error al editar la playlist:', error);
     });
+}
+
+export function DeletePlaylist(songId){
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    return fetch(`/api/delete-playlist/${songId}`, {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
 }

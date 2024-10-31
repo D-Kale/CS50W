@@ -14,6 +14,7 @@ urlpatterns = [
     path('playlist/<int:playlistId>', ShowPlaylist, name="playlist"),
     path('delete-playlist/<int:id>', delete_playlist, name="delete-playlist"),
 
+    path('like/<str:type>/<int:id>', like, name="like"),
 
     path('currentUser/', CurrentUser, name="currentuser"),
     path('currentUser/change/usertype/', SupUser, name="supUser"),

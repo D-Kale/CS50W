@@ -49,7 +49,7 @@ class Song(models.Model):
             'name': self.name,
             'state': self.state,
             'artist': self.artist,
-            'file_url': self.file.url,
+            'file_url':  "media/"+self.file.name,
             'duration': str(self.duration),
             'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
             'likes': self.like.count()
