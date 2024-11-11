@@ -1,36 +1,50 @@
-$primary-color: #1DB954;
-$background-color: #121212;
-$card-background: #181818;
-$text-color: #FFFFFF;
+// Variables de color personalizadas
+$spotify-blue: #00BFFF;
+$spotify-black: #191414;
+$spotify-white: #FFFFFF;
+$spotify-gray: #535353;
+
+$primary-color: $spotify-blue;
+$background-color: $spotify-black;
+$card-background: $spotify-gray;
+$text-color: $spotify-white;
 $secondary-text-color: #b3b3b3;
 
+// Estilos del cuerpo
 body {
   background-color: $background-color;
   color: $text-color;
   font-family: 'Circular', Arial, sans-serif;
 }
 
+// Estilos de la barra de navegación
 nav {
   background-color: $card-background;
   padding: 1rem;
-  
+  display: flex;
+  justify-content: space-between;
+
+  .nav-list{
+    display: flex;
+  }
+
   h1 {
     margin: 0;
     color: $primary-color;
   }
-  
+
   ul {
     list-style-type: none;
     padding: 0;
-    
+
     li {
       display: inline;
       margin-right: 1rem;
-      
+
       a {
         color: $text-color;
         text-decoration: none;
-        
+
         &:hover {
           color: $primary-color;
         }
@@ -39,6 +53,7 @@ nav {
   }
 }
 
+// Estilos del contenedor principal
 .container {
   max-width: 1200px;
   margin: 2rem auto;
@@ -48,6 +63,7 @@ nav {
   box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
 }
 
+// Estilos para las tarjetas de canciones
 .song-card {
   background-color: $card-background;
   border-radius: 8px;
@@ -56,16 +72,16 @@ nav {
   display: flex;
   flex-direction: column;
   transition: background-color 0.3s ease;
-  
+
   &:hover {
     background-color: lighten($card-background, 5%);
   }
-  
+
   .top {
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
-    
+
     .pfp {
       width: 60px;
       height: 60px;
@@ -76,23 +92,23 @@ nav {
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      
+
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
-      
+
       .playing {
         display: flex;
         gap: 2px;
-        
+
         .greenline {
           background-color: $text-color;
           width: 3px;
           height: 20px;
           animation: playing 1s ease-in-out infinite;
-          
+
           @for $i from 1 through 5 {
             &:nth-child(#{$i}) {
               animation-delay: $i * 0.1s;
@@ -101,17 +117,17 @@ nav {
         }
       }
     }
-    
+
     .texts {
       flex-grow: 1;
-      
+
       .title-1 {
         font-size: 1.2rem;
         font-weight: bold;
         margin: 0;
         color: $text-color;
       }
-      
+
       .title-2 {
         font-size: 0.9rem;
         color: $secondary-text-color;
@@ -119,13 +135,13 @@ nav {
       }
     }
   }
-  
+
   .controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    
+
     button {
       background: none;
       border: none;
@@ -133,19 +149,19 @@ nav {
       cursor: pointer;
       font-size: 1.2rem;
       transition: color 0.3s ease;
-      
+
       &:hover {
         color: $primary-color;
       }
     }
   }
-  
+
   .time {
     background-color: #5e5e5e;
     height: 4px;
     border-radius: 2px;
     margin-bottom: 0.5rem;
-    
+
     .elapsed {
       background-color: $primary-color;
       height: 100%;
@@ -154,7 +170,7 @@ nav {
       transition: width 0.1s linear;
     }
   }
-  
+
   .timetext {
     display: flex;
     justify-content: space-between;
@@ -163,8 +179,117 @@ nav {
   }
 }
 
+// Animación para la línea de reproducción
 @keyframes playing {
   0% { transform: scaleY(0.1); }
   50% { transform: scaleY(1); }
   100% { transform: scaleY(0.1); }
+}
+
+
+
+.playlist-card {
+  background-color: $card-background;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .playlist-info {
+      flex-grow: 1;
+  }
+
+  .playlist-title {
+      color: $text-color;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+  }
+
+  .playlist-creator,
+  .playlist-duration,
+  .playlist-likes {
+      color: $secondary-text-color;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+  }
+
+  .playlist-actions {
+      display: flex;
+      align-items: center;
+  }
+}
+
+.like-btn, .playlist-like-btn {
+  &.liked {
+      color: $primary-color;
+  }
+}
+
+.like-btn,
+.view-playlist-btn {
+  background: none;
+  border: none;
+  color: $secondary-text-color;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  margin-left: 1rem;
+
+  &:hover {
+      color: $primary-color;
+  }
+}
+
+.view-playlist-btn {
+  background-color: $primary-color;
+  color: $text-color;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+
+  &:hover {
+      background-color: darken($primary-color, 10%);
+  }
+}
+
+.playlist-details {
+  background-color: $card-background;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.songs-header {
+  color: $text-color;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.song-list {
+  list-style-type: none;
+  padding-left: 0;
+
+  .song-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      border-bottom: 1px solid $spotify-gray;
+
+      &:last-child {
+          border-bottom: none;
+      }
+
+      .song-name {
+          color: $text-color;
+          font-weight: bold;
+      }
+
+      .song-artist,
+      .song-duration {
+          color: $secondary-text-color;
+      }
+  }
 }
